@@ -28,10 +28,10 @@ class Contacts extends Component {
       phone: this.state.phone,
       id: shortId(),
     });
-    // this.setState({
-    //     name: "",
-    //     phone: ""
-    //   })
+    this.setState({
+        name: "",
+        phone: ""
+      })
   };
 
   searchNewContact = (e)=> {
