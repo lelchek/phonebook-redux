@@ -1,11 +1,15 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { addContact } from "../redux/actions";
+import { addContact, deleteContact, searchContact } from "../redux/actions";
+import { Link } from 'react-router-dom'
+import shortId from 'shortid'
+
 
 class Contacts extends Component {
   state = {
     name: "",
-    phone: ""
+    phone: "",
+    searchValue: ""
   };
 
   handleChange = e => {
@@ -22,15 +26,28 @@ class Contacts extends Component {
     this.props.addContact({
       name: this.state.name,
       phone: this.state.phone,
-      id: 2
+      id: shortId(),
     });
+    // this.setState({
+    //     name: "",
+    //     phone: ""
+    //   })
   };
 
+  searchNewContact = (e)=> {
+    this.props.searchContact(e.target.value);
+    this.setState({searchValue:e.target.value })
+  }
+
+
+
   render() {
+    const renderContacts = this.state.searchValue !== "" ? this.props.filteredContacts : this.props.contacts;
     const { name, phone } = this.state;
     return (
       <div>
-        {console.log("props->", this.props)}
+          {/* <Link to="/">Come Back</Link> */}
+          <button type="button" onClick={()=>this.props.history.push("/")}>Go Back</button>
         <h2>Contacts</h2>
         <form onSubmit={this.addNewContact}>
           <input
@@ -53,15 +70,19 @@ class Contacts extends Component {
           <button type="submit">Submit</button>
         </form>
         <h3>Filter</h3>
-        <input type="search" placeholder="search name" name="search" />
+        <input type="search" placeholder="search name" name="search" onChange={this.searchNewContact} value={this.state.searchValue} />
         <h3>Contact List</h3>
         <ul>
-          {this.props.contacts.map(contact => (
+          {renderContacts.map(contact => {              
+              return(
             <li key={contact.id}>
               <span>Name: {contact.name} </span>
-              <span>Phone: {contact.phone}</span>
+              <span>Phone: {contact.phone} </span>
+              <button type="button" 
+              onClick={()=> this.props.deleteContact(contact.id)}>Delete</button>
             </li>
-          ))}
+          )})}
+
         </ul>
       </div>
     );
@@ -71,13 +92,16 @@ class Contacts extends Component {
 const mapStateToProps = state => {
   console.log("state :", state);
   return {
-    contacts: state.contacts
+    contacts: state.contacts,
+    filteredContacts: state.filteredContacts
   };
 };
 
 // добавила этот метод
 const mapDispatchToProps = {
-  addContact
+  addContact,
+  deleteContact,
+  searchContact
 };
 
 // addContact заменила на mapDispatchToProps в connect
